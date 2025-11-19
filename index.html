@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title id="pageTitle">年糕的狗齡換算器｜比熊犬</title>
+  <meta name="description" content="計算年糕（比熊犬）的狗齡與對應的人類年齡。一頁式、手機優先、RWD 設計。" />
+  <!--  放入這三行開始 -->
+  <link rel="icon" type="image/png" href="./icon_linko.png">
+  <link rel="apple-touch-icon" href="./icon_linko.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="./icon_linko.png">
+  <!--  放入這三行結束 -->
+  <style>
+    :root {
+      --fg: #0f172a;
+      /* 前景深色 */
+      --fg-weak: #334155;
+      /* 次要字色 */
+      --accent: #2563eb;
+      /* 主色 */
+      --accent-weak: #93c5fd;
+      /* 主色淺 */
+      --error: #dc2626;
+      /* 錯誤色 */
+      --card-bg: rgba(255, 255, 255, 0.85);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      --radius: 14px;
+      --space-1: 6px;
+      --space-2: 10px;
+      --space-3: 14px;
+      --space-4: 18px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --font-size: clamp(14px, 3.8vw, 16px);
+      --h1: clamp(20px, 6vw, 28px);
+      --h2: clamp(18px, 5vw, 22px);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* 全局與背景 */
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans TC", Arial, "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+      font-size: var(--font-size);
+      color: #fff;
+      line-height: 1.6;
+      background: #111;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .bg {
+      position: fixed;
+      inset: 0;
+      background-image: url('./dog.png');
+      background-size: cover;
+      background-position: center;
+      filter: none;
+      z-index: -2;
+    }
+
+    .bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.55));
+      z-index: -1;
+    }
+
+    header,
+    main,
+    footer {
+      display: block;
+    }
+
+    /* 右上角資訊卡 */
+    .panel {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: min(92vw, 360px);
+      padding: clamp(12px, 3vw, 18px);
+      background: var(--card-bg);
+      color: var(--fg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0.4;
+      transition: opacity .25s ease, transform .25s ease;
+      will-change: opacity, transform;
+      outline: none;
+    }
+
+    .panel:hover,
+    .panel:focus-within {
+      opacity: 1;
+    }
+
+    .panel header h1 {
+      margin: 0 0 var(--space-2);
+      font-size: var(--h1);
+      line-height: 1.25;
+    }
+
+    .sub {
+      margin: 0 0 var(--space-3);
+      color: var(--fg-weak);
+      font-size: var(--h2);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      color: #111827;
+      border-radius: 999px;
+      padding: 6px 10px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      margin-bottom: var(--space-3);
+      font-weight: 600;
+    }
+
+    .avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fef3c7, #fde68a);
+      display: inline-block;
+      border: 2px solid #fff;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--fg);
+    }
+
+    input[type="date"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      color: #111827;
+      box-sizing: border-box;
+      font-size: 1em;
+    }
+
+    .actions {
+      display: flex;
+      gap: var(--space-2);
+      margin: var(--space-2) 0 var(--space-3);
+    }
+
+    .btn-primary {
+      appearance: none;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+      transition: transform .08s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(37, 99, 235, 0.4);
+      background: #1d4ed8;
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 14px rgba(37, 99, 235, 0.32);
+    }
+
+    .result {
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+      display: grid;
+      gap: 6px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .result .kv {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .result .kv .k {
+      color: #475569;
+    }
+
+    .result .kv .v {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .error {
+      display: none;
+      margin-top: var(--space-2);
+      color: #fff;
+      background: var(--error);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    /* 公式與日期說明（頁面底部） */
+    .note {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: env(safe-area-inset-bottom, 10px);
+      width: min(92vw, 820px);
+      color: #e5e7eb;
+      text-align: center;
+      font-size: clamp(12px, 2.8vw, 14px);
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+      padding: 6px 10px;
+      user-select: none;
+    }
+
+    .note code {
+      font-family: var(--mono);
+      background: rgba(255, 255, 255, 0.12);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    /* 較大螢幕微調 */
+    @media (min-width: 768px) {
+      .panel {
+        width: 380px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <section class="panel" id="panel" tabindex="-1" aria-live="polite" aria-label="年糕的資訊與換算工具">
+    <header>
+      <div class="badge">
+        <span class="avatar" aria-hidden="true"></span>
+        <span id="badgeNameBreed">年糕 | 比熊犬</span>
+      </div>
+      <h1>狗齡換算成人類年齡</h1>
+      <p class="sub">依照公式：人類年齡 = 16 × ln(狗的年齡) + 31</p>
+    </header>
+
+    <main>
+      <div class="form-row">
+        <label for="dogName">狗狗名字</label>
+        <input id="dogName" name="dogName" type="text" inputmode="text" autocomplete="name" value="年糕" />
+      </div>
+
+      <div class="form-row">
+        <label for="breed">犬種</label>
+        <input id="breed" name="breed" type="text" inputmode="text" autocomplete="off" value="比熊犬" />
+      </div>
+
+      <div class="form-row">
+        <label for="birth">出生日期</label>
+        <input id="birth" name="birth" type="date" inputmode="numeric" autocomplete="bday" />
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" id="calcBtn" type="button">立即計算</button>
+      </div>
+
+      <div class="result" id="result" aria-live="polite">
+        <div class="kv"><span class="k">狗齡（年）</span><span class="v" id="dogYears">—</span></div>
+        <div class="kv"><span class="k">人類年齡（年）</span><span class="v" id="humanYears">—</span></div>
+      </div>
+
+      <div class="error" id="errorBox" role="alert">日期無效或為未來日期，請重新輸入。</div>
+    </main>
+  </section>
+
+  <footer class="note" id="note">
+    <span id="formulaText">人類年齡 = 16 × ln(狗的年齡) + 31</span>
+    <span> · 今日基準：<code id="todayText"></code></span>
+  </footer>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const DEFAULT_BIRTH = "2022-03-20";
+      const DEFAULT_NAME = "年糕";
+      const DEFAULT_BREED = "比熊犬";
+
+      const birthInput = document.getElementById("birth");
+      const nameInput = document.getElementById("dogName");
+      const breedInput = document.getElementById("breed");
+
+      const calcBtn = document.getElementById("calcBtn");
+      const dogYearsEl = document.getElementById("dogYears");
+      const humanYearsEl = document.getElementById("humanYears");
+      const errorBox = document.getElementById("errorBox");
+      const todayText = document.getElementById("todayText");
+      const panel = document.getElementById("panel");
+
+      const badgeNameBreed = document.getElementById("badgeNameBreed");
+      const pageTitleEl = document.getElementById("pageTitle");
+
+      // 工具：格式化 yyyy-mm-dd（以使用者時區的「今天」）
+      function formatDateYMD(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, "0");
+        const d = String(date.getDate()).padStart(2, "0");
+        return `${y}-${m}-${d}`;
+      }
+
+      // 計算兩日期的天數差（以本地時區，避免 DST 誤差）
+      function daysBetween(a, b) {
+        // 以 UTC 零點計算，避免夏令時變化
+        const utcA = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+        const utcB = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+        return Math.round((utcB - utcA) / (1000 * 60 * 60 * 24));
+      }
+
+      function roundTo(n, digits) {
+        const p = Math.pow(10, digits);
+        return Math.round((n + Number.EPSILON) * p) / p;
+      }
+
+      function showError(msg) {
+        errorBox.textContent = msg;
+        errorBox.classList.add("show");
+      }
+
+      function clearError() {
+        errorBox.classList.remove("show");
+      }
+
+      function updateNameBreedTexts() {
+        const name = (nameInput.value || DEFAULT_NAME).trim();
+        const breed = (breedInput.value || DEFAULT_BREED).trim();
+
+        // 第 6 行：<title> 年糕的狗齡換算器｜比熊犬
+        pageTitleEl.textContent = `${name}的狗齡換算器｜${breed}`;
+
+        // 第 7 行（meta description 內容不動，以免變更 SEO；如需動態也可改，但需求未指定）
+
+        // 第 242 行：panel aria-label
+        panel.setAttribute("aria-label", `${name}的資訊與換算工具`);
+
+        // 第 246 行：徽章上的 "年糕 | 比熊犬"
+        badgeNameBreed.textContent = `${name} | ${breed}`;
+      }
+
+      // 主要計算流程
+      function calculate() {
+        clearError();
+
+        const today = new Date();
+        const todayYMD = formatDateYMD(today);
+        todayText.textContent = todayYMD;
+
+        const val = birthInput.value;
+        if (!val) {
+          showError("請先輸入出生日期。");
+          dogYearsEl.textContent = "—";
+          humanYearsEl.textContent = "—";
+          return;
+        }
+
+        const birthDate = new Date(val + "T00:00:00"); // 避免時區錯位
+        if (isNaN(birthDate.getTime())) {
+          showError("日期格式無效，請重新輸入。");
+          dogYearsEl.textContent = "—";
+          humanYearsEl.textContent = "—";
+          return;
+        }
+
+        // 未來日期或當天：視為無效
+        const dayDiff = daysBetween(birthDate, today);
+        if (dayDiff <= 0) {
+          showError("日期無效或為未來日期，請重新輸入。");
+          dogYearsEl.textContent = "—";
+          humanYearsEl.textContent = "—";
+          return;
+        }
+
+        // 年數：以回歸年換算
+        const dogYears = dayDiff / 365.2425;
+
+        if (dogYears <= 0) {
+          showError("狗齡不可小於或等於 0。");
+          dogYearsEl.textContent = "—";
+          humanYearsEl.textContent = "—";
+          return;
+        }
+
+        // 公式：人類年齡 = 16 × ln(狗的年齡) + 31（自然對數）
+        const humanYears = 16 * Math.log(dogYears) + 31;
+
+        dogYearsEl.textContent = roundTo(dogYears, 2).toFixed(2);
+        humanYearsEl.textContent = roundTo(humanYears, 1).toFixed(1);
+      }
+
+      // debounce：即時計算模式（加分項）
+      function debounce(fn, wait) {
+        let t;
+        return function () {
+          clearTimeout(t);
+          t = setTimeout(fn, wait);
+        };
+      }
+
+      // 本地儲存（加分項）
+      const LS_KEY_BIRTH = "niangao_birth_date";
+      const LS_KEY_NAME = "dog_name";
+      const LS_KEY_BREED = "dog_breed";
+
+      function loadBirth() {
+        try {
+          const saved = localStorage.getItem(LS_KEY_BIRTH);
+          return saved || DEFAULT_BIRTH;
+        } catch (_) {
+          return DEFAULT_BIRTH;
+        }
+      }
+      function saveBirth(val) {
+        try { localStorage.setItem(LS_KEY_BIRTH, val); } catch (_) { }
+      }
+      function loadName() {
+        try {
+          const saved = localStorage.getItem(LS_KEY_NAME);
+          return saved || DEFAULT_NAME;
+        } catch (_) {
+          return DEFAULT_NAME;
+        }
+      }
+      function saveName(val) {
+        try { localStorage.setItem(LS_KEY_NAME, val); } catch (_) { }
+      }
+      function loadBreed() {
+        try {
+          const saved = localStorage.getItem(LS_KEY_BREED);
+          return saved || DEFAULT_BREED;
+        } catch (_) {
+          return DEFAULT_BREED;
+        }
+      }
+      function saveBreed(val) {
+        try { localStorage.setItem(LS_KEY_BREED, val); } catch (_) { }
+      }
+
+      // 初始化
+      function init() {
+        // 預設日期（帶入 localStorage 或預設值）
+        birthInput.value = loadBirth();
+
+        // 預設名字與犬種
+        nameInput.value = loadName();
+        breedInput.value = loadBreed();
+
+        // 先同步頁面上會顯示名字/犬種的位置
+        updateNameBreedTexts();
+
+        // 初次計算
+        calculate();
+
+        // 事件：按鈕
+        calcBtn.addEventListener("click", calculate);
+
+        // 事件：日期變更即時計算（debounce 200ms）
+        const debouncedBirth = debounce(function () {
+          saveBirth(birthInput.value);
+          calculate();
+        }, 200);
+        birthInput.addEventListener("input", debouncedBirth);
+        birthInput.addEventListener("change", function () {
+          saveBirth(birthInput.value);
+          calculate();
+        });
+
+        // 事件：名字/犬種變更即時更新標題、徽章與 aria-label（不影響樣式/功能）
+        const debouncedNameBreed = debounce(function () {
+          saveName(nameInput.value.trim());
+          saveBreed(breedInput.value.trim());
+          updateNameBreedTexts();
+        }, 150);
+        nameInput.addEventListener("input", debouncedNameBreed);
+        breedInput.addEventListener("input", debouncedNameBreed);
+        nameInput.addEventListener("change", debouncedNameBreed);
+        breedInput.addEventListener("change", debouncedNameBreed);
+
+        // 觸控裝置：點擊 panel 提升透明度
+        panel.addEventListener("touchstart", function () {
+          panel.style.opacity = "1";
+          // 2 秒後還原（若未聚焦）
+          setTimeout(function () {
+            if (!panel.matches(":focus-within")) {
+              panel.style.opacity = "";
+            }
+          }, 2000);
+        }, { passive: true });
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    })();
+  </script>
+</body>
+
+</html>
